@@ -1,0 +1,12 @@
+[all:vars]
+
+[fedora]
+f39c1 ansible_host=192.168.218.133
+
+[ubuntu]
+u24c1 ansible_host=192.168.218.130
+u24c2 ansible_host=192.168.218.131
+
+[linux:children]
+fedora
+ubuntu
