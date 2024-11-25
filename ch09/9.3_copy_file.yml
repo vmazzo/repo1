@@ -1,0 +1,63 @@
+---
+- hosts: all
+  become: true
+  collections:
+    - ansible.builtin
+  
+  pre_tasks:
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install updates (Fedora)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Fedora"
+
+- hosts: linux
+  become: true
+  
+  tasks:  
+
+  - name: install apache2 & PHP packages or Ubuntu
+    tags: ubuntu,apache
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install httpd & php packages for Fedora/CentOS
+    tags: fedora,httpd
+    dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "Fedora" 
+
+  - name: copy default html file to web servers
+    tags: apache, httpd
+    copy:
+      src: default_site.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+
+- hosts: fedora
+  become: true
+  gather_facts: false
+  tasks:
+  - name: Restart web services
+    service:
+      name: httpd
+      state: restarted  
+          

@@ -1,0 +1,36 @@
+---
+- hosts: f39c1
+  become: true
+  gather_facts: false
+  collections:
+    - ansible.builtin
+
+  tasks:
+  - name: Install unzip
+    package:
+      name: unzip
+
+  - name: Install Terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      owner: root
+      group: root
+
+  - name: Check if Terraform is installed
+    stat:
+      path: /usr/local/bin/terraform
+    register: terraform_installed
+
+  - name: Get Terraform version
+    command: /usr/local/bin/terraform version
+    register: terraform_version
+    changed_when: false
+    when: terraform_installed.stat.exists
+
+  - name: Print Terraform version
+    debug:
+      var: terraform_version.stdout_lines
+    when: terraform_installed.stat.exists    
+

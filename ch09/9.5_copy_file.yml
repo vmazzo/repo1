@@ -1,0 +1,13 @@
+---
+- name: Copy httpd.conf from f39c1 to local directory
+  hosts: f39c1
+  gather_facts: false
+  collections:
+    - ansible.builtin
+
+  tasks:
+    - name: Copy httpd.conf file
+      fetch:
+        src: /etc/httpd/conf/httpd.conf
+        dest: ./
+        flat: yes    
